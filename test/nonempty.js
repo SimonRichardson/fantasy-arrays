@@ -7,10 +7,14 @@ var λ       = require('fantasy-check/src/adapters/nodeunit'),
     NonEmpty = arrays.NonEmpty,
     identity = combinators.identity;
 
+function run(x) {
+    return x.toSequence().toArray();
+}
+
 exports.nonempty = {
     
     // Functor tests
-    'All (Functor)': functor.laws(λ)(NonEmpty.of, identity),
-    'Identity (Functor)': functor.identity(λ)(NonEmpty.of, identity),
-    'Composition (Functor)': functor.composition(λ)(NonEmpty.of, identity)
+    'All (Functor)': functor.laws(λ)(NonEmpty.of, run),
+    'Identity (Functor)': functor.identity(λ)(NonEmpty.of, run),
+    'Composition (Functor)': functor.composition(λ)(NonEmpty.of, run)
 };
