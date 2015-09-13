@@ -7,9 +7,7 @@ NonEmpty.of = function(x) {
     return NonEmpty(x, Sequence.empty());
 };
 
-NonEmpty.singleton = function(x) {
-    return NonEmpty.of(x);
-};
+NonEmpty.singleton = NonEmpty.of;
 
 NonEmpty.prototype.map = function(f) {
     return NonEmpty(f(this.a), this.as.map(f));

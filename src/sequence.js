@@ -6,9 +6,7 @@ Sequence.of = function(x) {
     return Sequence([x]);
 };
 
-Sequence.singleton = function(x) {
-    return Sequence.of(x);
-};
+Sequence.singleton = Sequence.of;
 
 Sequence.empty = function() {
     return Sequence([]);
