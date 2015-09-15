@@ -16,7 +16,7 @@ function eq(a, b) {
     return a === b;
 }
 
-Sequence.prototype.range = function(a, b) {
+Sequence.range = function(a, b) {
     var step = a > b ? -1 : 1,
         result = [],
         i, n;
@@ -43,7 +43,7 @@ Sequence.prototype.replicateM = function(n, m) {
 };
 
 Sequence.prototype.nil = function() {
-    return this.length() === 0;
+    return this.x.length < 1;
 };
 
 Sequence.prototype.length = function() {
@@ -148,14 +148,22 @@ Sequence.prototype.updateAt = function(a, b) {
     return Option.Some(Sequence(r));
 };
 
-Sequence.prototype.alterAt = function(a, b) {
+Sequence.prototype.modifyAt = function(n, f) {
+    return this.alterAt(n, function(x) {
+        return Option.Some(f(x));
+    });
+};
+
+Sequence.prototype.alterAt = function(n, f) {
     var self = this;
-    return self.index(a).fold(
+    return self.index(n).fold(
         function(x) {
-            return self.updateAt(a, x);
+            return f(x).chain(function(y) {
+                return self.updateAt(n, y);
+            });
         },
         function() {
-            return self.deleteAt(a);
+            return self.deleteAt(n);
         }
     );
 };
