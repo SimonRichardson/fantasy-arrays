@@ -52,6 +52,12 @@ NonEmpty.prototype.concat = function(a) {
     return NonEmpty(a.a, a.as.concat(Seq.of(this.a).concat(this.as)));
 };
 
+NonEmpty.prototype.ap = function(x) {
+    return this.chain(function(f) {
+        return x.map(f);
+    });
+};
+
 NonEmpty.prototype.map = function(f) {
     return NonEmpty(f(this.a), this.as.map(f));
 };

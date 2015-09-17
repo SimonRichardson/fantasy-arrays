@@ -1,8 +1,9 @@
-var λ         = require('fantasy-check/src/adapters/nodeunit'),
-    functor   = require('fantasy-check/src/laws/functor'),
-    monad     = require('fantasy-check/src/laws/monad'),
-    monoid    = require('fantasy-check/src/laws/monoid'),
-    semigroup = require('fantasy-check/src/laws/semigroup'),
+var λ           = require('fantasy-check/src/adapters/nodeunit'),
+    applicative = require('fantasy-check/src/laws/applicative'),
+    functor     = require('fantasy-check/src/laws/functor'),
+    monad       = require('fantasy-check/src/laws/monad'),
+    monoid      = require('fantasy-check/src/laws/monoid'),
+    semigroup   = require('fantasy-check/src/laws/semigroup'),
 
     combinators = require('fantasy-combinators'),
     arrays      = require('../fantasy-arrays'),
@@ -15,6 +16,13 @@ function run(x) {
 }
 
 exports.seq = {
+
+    // Applicative Functor tests
+    'All (Applicative)': applicative.laws(λ)(Seq, run),
+    'Identity (Applicative)': applicative.identity(λ)(Seq, run),
+    'Composition (Applicative)': applicative.composition(λ)(Seq, run),
+    'Homomorphism (Applicative)': applicative.homomorphism(λ)(Seq, run),
+    'Interchange (Applicative)': applicative.interchange(λ)(Seq, run),
     
     // Functor tests
     'All (Functor)': functor.laws(λ)(Seq.of, run),

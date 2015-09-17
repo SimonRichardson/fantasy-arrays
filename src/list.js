@@ -267,6 +267,12 @@ List.prototype.concatMap = function(f) {
     return this.chain(f);
 };
 
+List.prototype.ap = function(x) {
+    return this.chain(function(f) {
+        return x.map(f);
+    });
+};
+
 List.prototype.map = function(f) {
     var go = function(x, acc) {
         return x.cata({

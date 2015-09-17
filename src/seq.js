@@ -185,6 +185,12 @@ Seq.prototype.concatMap = function(f) {
     return this.chain(f);
 };
 
+Seq.prototype.ap = function(x) {
+    return this.chain(function(f) {
+        return x.map(f);
+    });
+};
+
 Seq.prototype.map = function(f) {
     var l = this.x.length,
         r = new Array(l),
