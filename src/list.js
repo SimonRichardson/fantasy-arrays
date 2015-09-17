@@ -2,6 +2,7 @@ var daggy       = require('daggy'),
     combinators = require('fantasy-combinators'),
 
     constant = combinators.constant,
+    identity = combinators.identity,
     
     List = daggy.taggedSum({
         Cons: ['x', 'xs'],
@@ -265,6 +266,22 @@ List.prototype.concatMap = function(f) {
     });
 };
 
+List.prototype.map = function(f) {
+    var go = function(x, acc) {
+        return x.cata({
+            Nil: constant(acc),
+            Cons: function(x, xs) {
+                return go(xs, List.Cons(f(x), acc));
+            }
+        });
+    };
+    return go(this, List.Nil).reverse();
+};
+
+List.prototype.chain = function(f) {
+    return this;
+};
+
 List.prototype.filter = function(f) {
     var go = function(x, acc) {
         return x.cata({
@@ -291,16 +308,124 @@ List.prototype.filterM = function(f) {
     });
 };
 
-List.prototype.map = function(f) {
+List.prototype.mapMaybe = function(f) {
     var go = function(x, acc) {
         return x.cata({
-            Nil: constant(acc),
+            Nil: function() {
+                return acc.reverse();
+            },
             Cons: function(x, xs) {
-                return go(xs, List.Cons(f(x), acc));
+                return f(x).cata({
+                    None: function() {
+                        return go(xs, acc);
+                    },
+                    Some: function(y) {
+                        return go(xs, List.Cons(y, acc));
+                    }
+                });
             }
         });
     };
-    return go(this, List.Nil).reverse();
+    return go(this, List.Nil);
+};
+
+List.prototype.catMaybes = function() {
+    return this.mapMaybe(identity);
+};
+
+List.prototype.slice = function(a, b) {
+    return this.take(b - a, this.drop(a));
+};
+
+List.prototype.take = function(a) {
+    var go = function(x, n, acc) {
+        return n === 0 ? acc.reverse() :
+            x.cata({
+                Nil: function() {
+                    return acc.reverse();
+                },
+                Cons: function(x, xs) {
+                    return go(xs, n - 1, List.Cons(x, acc));
+                }
+            });
+    };
+    return go(this, a, List.Nil);
+};
+
+List.prototype.takeWhile = function(f) {
+    var go = function(x, acc) {
+        return x.cata({
+            Nil: function() {
+                return acc.reverse();
+            },
+            Cons: function(x, xs) {
+                return f(x) ? go(xs, List.Cons(x, acc)) : acc.reverse();
+            }
+        });
+    };
+    return go(this, List.Nil);
+};
+
+List.prototype.drop = function(n) {
+    return n === 0 ? this : 
+        x.cata({
+            Nil: constant(List.Nil),
+            Cons: function(x, xs) {
+                return xs.drop(n - 1);
+            }
+        });
+};
+
+List.prototype.dropWhile = function(f) {
+    var go = function(x) {
+        return x.cata({
+            Nil: constant(x),
+            Cons: function(y, xs) {
+                return f(y) ? go(xs) : x;
+            }
+        });
+    };
+    return go(this);
+};
+
+List.prototype.span = function(f) {
+    var self = this,
+        rest = function() {
+            return {
+                init: List.Nil,
+                rest: self
+            };
+        },
+        add = function(x, h) {
+            return {
+                init: List.Cons(x, h.init),
+                rest: h.rest
+            };
+        };
+    return this.cata({
+        Nil: rest,
+        Cons: function(x, xs) {
+            return f(x) ? add(x, xs.span(f)) : rest();
+        }
+    });
+};
+
+List.prototype.group = function() {
+    return this.groupBy(eq);
+};
+
+List.prototype.groupBy = function(f) {
+    var add = function(h) {
+        return List.Cons(List.Cons(x, h.init), h.rest.groupBy(eq));
+    };
+    return this.cata({
+        Nil: constant(List.Nil),
+        Cons: function(x, xs) {
+            return add(xs.span(function(y) {
+                return eq(x, y);
+            }));
+        }
+    });
 };
 
 List.prototype.toArray = function() {
