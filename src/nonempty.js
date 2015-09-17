@@ -1,10 +1,10 @@
 var daggy = require('daggy'),
-    Sequence = require('./sequence'),
+    Seq   = require('./seq'),
 
     NonEmpty = daggy.tagged('a', 'as');
 
 NonEmpty.of = function(x) {
-    return NonEmpty(x, Sequence.empty());
+    return NonEmpty(x, Seq.empty());
 };
 
 NonEmpty.singleton = NonEmpty.of;
@@ -21,8 +21,12 @@ NonEmpty.prototype.concatMap = function(f) {
     return this.chain(f);
 };
 
-NonEmpty.prototype.toSequence = function() {
+NonEmpty.prototype.toSeq = function() {
     return this.as.cons(this.a);
+};
+
+NonEmpty.prototype.toArray = function() {
+    return this.as.cons(this.a).toArray();
 };
 
 // Export

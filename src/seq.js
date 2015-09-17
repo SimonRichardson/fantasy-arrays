@@ -1,22 +1,29 @@
-var daggy = require('daggy'),
-    
-    Sequence = daggy.tagged('x');
+var daggy       = require('daggy'),
+    combinators = require('fantasy-combinators'),
+    tuples      = require('fantasy-tuples'),
 
-Sequence.of = function(x) {
-    return Sequence([x]);
+    constant = combinators.constant,
+    identity = combinators.identity,
+
+    Tuple2 = tuples.Tuple2,
+    
+    Seq = daggy.tagged('x');
+
+Seq.of = function(x) {
+    return Seq([x]);
 };
 
-Sequence.singleton = Sequence.of;
+Seq.singleton = Seq.of;
 
-Sequence.empty = function() {
-    return Sequence([]);
+Seq.empty = function() {
+    return Seq([]);
 };
 
 function eq(a, b) {
     return a === b;
 }
 
-Sequence.range = function(a, b) {
+Seq.range = function(a, b) {
     var step = a > b ? -1 : 1,
         result = [],
         i, n;
@@ -24,12 +31,12 @@ Sequence.range = function(a, b) {
         result[n++] = i;
     }
     result[n] = i;
-    return Sequence(result);
+    return Seq(result);
 };
 
-Sequence.prototype.replicate = function(n, v) {
-    if (n < 1) return Sequence.empty();
-    var r = Sequence(new Array(n)),
+Seq.prototype.replicate = function(n, v) {
+    if (n < 1) return Seq.empty();
+    var r = Seq(new Array(n)),
         i;
     for(i = 0; i < n; i++) {
         r.x[i] = v;
@@ -37,48 +44,48 @@ Sequence.prototype.replicate = function(n, v) {
     return r;
 };
 
-Sequence.prototype.replicateM = function(n, m) {
-    if (n < 1) return Sequence.empty();
+Seq.prototype.replicateM = function(n, m) {
+    if (n < 1) return Seq.empty();
     return this.replicate(n).sequence();
 };
 
-Sequence.prototype.nil = function() {
+Seq.prototype.nil = function() {
     return this.x.length < 1;
 };
 
-Sequence.prototype.length = function() {
+Seq.prototype.length = function() {
     return this.x.length;
 };
 
-Sequence.prototype.cons = function(a) {
-    return Sequence([a].concat(this.x));
+Seq.prototype.cons = function(a) {
+    return Seq([a].concat(this.x));
 };
 
-Sequence.prototype.snoc = function(a) {
+Seq.prototype.snoc = function(a) {
     var x = this.x.slice();
     x.push(a);
-    return Sequence(x);
+    return Seq(x);
 };
 
-Sequence.prototype.head = function() {
+Seq.prototype.head = function() {
     return this._uncons(constant(Option.None), Option.of);
 };
 
-Sequence.prototype.last = function() {
+Seq.prototype.last = function() {
     return this.index(this.x.length - 1);
 };
 
-Sequence.prototype.tail = function() {
+Seq.prototype.tail = function() {
     return this._uncons(constant(Option.None), function(a, b) {
         return Option.of(b);
     });
 };
 
-Sequence.prototype.init = function() {
+Seq.prototype.init = function() {
     return this.nil() ? Option.None : Just.of(this.slice(0, this.length() - 1));
 };
 
-Sequence.prototype.uncons = function(x, y) {
+Seq.prototype.uncons = function(x, y) {
     return this._uncons(constant(Option.None), function(a, b) {
         return Option.Some({
             head: a,
@@ -87,27 +94,27 @@ Sequence.prototype.uncons = function(x, y) {
     });
 };
 
-Sequence.prototype._uncons = function(x, y) {
-    return this.x.length === 0 ? x() : y(x[0], Sequence(x.slice(1)));
+Seq.prototype._uncons = function(x, y) {
+    return this.x.length === 0 ? x() : y(x[0], Seq(x.slice(1)));
 };
 
-Sequence.prototype.index = function(x) {
+Seq.prototype.index = function(x) {
     return x < 0 || x >= this.x.length ? Option.None : Option.of(this.x[x]);
 };
 
-Sequence.prototype.elemIndex = function(x) {
+Seq.prototype.elemIndex = function(x) {
     return this.findIndex(function(y) {
         return x === y;
     });
 };
 
-Sequence.prototype.elemLastIndex = function(x) {
+Seq.prototype.elemLastIndex = function(x) {
     return this.findLastIndex(function(y) {
         return x === y;
     });
 };
 
-Sequence.prototype.findIndex = function(f) {
+Seq.prototype.findIndex = function(f) {
     var i, l;
     for (i = 0, l = this.x.length; i < l; i++) {
         if (f(this.x[i])) {
@@ -117,7 +124,7 @@ Sequence.prototype.findIndex = function(f) {
     return Option.None;
 };
 
-Sequence.prototype.findLastIndex = function(f) {
+Seq.prototype.findLastIndex = function(f) {
     var i;
     for (i = this.x.length - 1; i >= 0; i--) {
         if (f(this.x[i])) {
@@ -127,34 +134,34 @@ Sequence.prototype.findLastIndex = function(f) {
     return Option.None;
 };
 
-Sequence.prototype.insertAt = function(a, b) {
+Seq.prototype.insertAt = function(a, b) {
     if (a < 0 || a > this.x.length) return Option.None;
     var r = this.x.slice();
     r.splice(a, 0, b);
-    return Option.Some(Sequence(r));
+    return Option.Some(Seq(r));
 };
 
-Sequence.prototype.deleteAt = function(a) {
+Seq.prototype.deleteAt = function(a) {
     if (a < 0 || a >= this.x.length) return Option.None;
     var r = this.x.slice();
     r.splice(a, 1);
-    return Option.Some(Sequence(r));
+    return Option.Some(Seq(r));
 };
 
-Sequence.prototype.updateAt = function(a, b) {
+Seq.prototype.updateAt = function(a, b) {
     if (a < 0 || a >= this.x.length) return Option.None;
     var r = this.x.slice();
     r[a] = b;
-    return Option.Some(Sequence(r));
+    return Option.Some(Seq(r));
 };
 
-Sequence.prototype.modifyAt = function(n, f) {
+Seq.prototype.modifyAt = function(n, f) {
     return this.alterAt(n, function(x) {
         return Option.Some(f(x));
     });
 };
 
-Sequence.prototype.alterAt = function(n, f) {
+Seq.prototype.alterAt = function(n, f) {
     var self = this;
     return self.index(n).fold(
         function(x) {
@@ -168,29 +175,29 @@ Sequence.prototype.alterAt = function(n, f) {
     );
 };
 
-Sequence.prototype.reverse = function() {
-    return Sequence(this.x.slice().reverse());
+Seq.prototype.reverse = function() {
+    return Seq(this.x.slice().reverse());
 };
 
-Sequence.prototype.concat = function(a) {
-    return Sequence(a.x.concat(this.x));
+Seq.prototype.concat = function(a) {
+    return Seq(a.x.concat(this.x));
 };
 
-Sequence.prototype.concatMap = function(f) {
+Seq.prototype.concatMap = function(f) {
     return this.chain(f);
 };
 
-Sequence.prototype.map = function(f) {
+Seq.prototype.map = function(f) {
     var l = this.x.length,
         r = new Array(l),
         i;
     for(i = 0; i < l; i++) {
         r[i] = f(this.x[i]);
     }
-    return Sequence(r);
+    return Seq(r);
 };
 
-Sequence.prototype.chain = function(f) {
+Seq.prototype.chain = function(f) {
     var r = [], 
         i, l, j, ll, a;
     for (i = 0, l = this.x.length; i < l; i++) {
@@ -199,52 +206,52 @@ Sequence.prototype.chain = function(f) {
             r.push(a.x[j]);
         }
     }
-    return Sequence(r);
+    return Seq(r);
 };
 
-Sequence.prototype.filter = function(f) {
-    return Sequence(this.x.filter(f));
+Seq.prototype.filter = function(f) {
+    return Seq(this.x.filter(f));
 };
 
-Sequence.prototype.filterM = function(f) {
-    return this._uncons(Sequence.empty, function(x, xs) {
+Seq.prototype.filterM = function(f) {
+    return this._uncons(Seq.empty, function(x, xs) {
         var a = f(x),
             b = xs.filterM(f);
         return a ? xs.cons(x) : b;
     });
 };
 
-Sequence.prototype.mapMaybe = function(f) {
+Seq.prototype.mapMaybe = function(f) {
     return this.concatMap(function(x) {
-        return f.fold(Sequence.empty, singleton);
+        return f.fold(Seq.empty, singleton);
     });
 };
 
-Sequence.prototype.catMaybes = function() {
+Seq.prototype.catMaybes = function() {
     return this.mapMaybe(identity);
 };
 
-Sequence.prototype.slice = function(a, b) {
-    return Sequence(this.x.slice(a, b));
+Seq.prototype.slice = function(a, b) {
+    return Seq(this.x.slice(a, b));
 };
 
-Sequence.prototype.take = function() {
+Seq.prototype.take = function() {
     return this.slice(0);
 };
 
-Sequence.prototype.takeWhile = function(f) {
+Seq.prototype.takeWhile = function(f) {
     return this.span(f).init;
 };
 
-Sequence.prototype.drop = function(n) {
+Seq.prototype.drop = function(n) {
     return n < 1 ? this : this.slice(n);
 };
 
-Sequence.prototype.dropWhile = function() {
+Seq.prototype.dropWhile = function() {
     return this.span(f).rest;
 };
 
-Sequence.prototype.span = function(f) {
+Seq.prototype.span = function(f) {
     var go = function(xs, acc) {
         return xs._uncons(
             function() {
@@ -260,14 +267,14 @@ Sequence.prototype.span = function(f) {
             }
         );
     };
-    return go(this, Sequence.empty());
+    return go(this, Seq.empty());
 };
 
-Sequence.prototype.group = function() {
+Seq.prototype.group = function() {
     return this.groupBy(eq);
 };
 
-Sequence.prototype.groupBy = function(f) {
+Seq.prototype.groupBy = function(f) {
     var go = function(xs, acc) {
         return xs._uncons(
             function() {
@@ -281,17 +288,17 @@ Sequence.prototype.groupBy = function(f) {
             }
         );
     };
-    return go(this, Sequence.empty());
+    return go(this, Seq.empty());
 };
 
-Sequence.prototype.nub = function() {
-    return this.numBy(eq);
+Seq.prototype.nub = function() {
+    return this.nubBy(eq);
 };
 
-Sequence.prototype.numBy = function(f) {
+Seq.prototype.nubBy = function(f) {
     return this._uncons(
         function() {
-            return Sequence.empty();
+            return Seq.empty();
         },
         function(h, t) {
             return t.filter(function(y) {
@@ -301,9 +308,9 @@ Sequence.prototype.numBy = function(f) {
     );
 };
 
-Sequence.prototype.zipWith = function(f, xs) {
+Seq.prototype.zipWith = function(f, xs) {
     var l = this.x.length < xs.x.length ? this.x.length : xs.x.length,
-        result = Sequence(new Array(l)),
+        result = Seq(new Array(l)),
         i;
     for (i = 0; i < l; i++) {
         result.x[i] = f(this.x[i], xs.x[i]);
@@ -311,14 +318,14 @@ Sequence.prototype.zipWith = function(f, xs) {
     return result;
 };
 
-Sequence.prototype.zip = function(x) {
+Seq.prototype.zip = function(x) {
     return this.zipWith(Tuple2, x);
 };
 
-Sequence.prototype.toArray = function() {
+Seq.prototype.toArray = function() {
     return this.x;
 };
 
 // Export
 if(typeof module != 'undefined')
-    module.exports = Sequence;
+    module.exports = Seq;

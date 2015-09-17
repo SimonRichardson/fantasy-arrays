@@ -4,7 +4,7 @@ var λ       = require('fantasy-check/src/adapters/nodeunit'),
     combinators = require('fantasy-combinators'),
     arrays      = require('../fantasy-arrays'),
 
-    Sequence = arrays.Sequence,
+    Seq      = arrays.Seq,
     identity = combinators.identity;
 
 function run(x) {
@@ -14,7 +14,7 @@ function run(x) {
 exports.sequence = {
     
     // Functor tests
-    'All (Functor)': functor.laws(λ)(Sequence.of, run),
-    'Identity (Functor)': functor.identity(λ)(Sequence.of, run),
-    'Composition (Functor)': functor.composition(λ)(Sequence.of, run)
+    'All (Functor)': functor.laws(λ)(Seq.of, run),
+    'Identity (Functor)': functor.identity(λ)(Seq.of, run),
+    'Composition (Functor)': functor.composition(λ)(Seq.of, run)
 };

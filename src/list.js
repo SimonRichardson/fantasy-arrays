@@ -1,9 +1,13 @@
 var daggy       = require('daggy'),
     combinators = require('fantasy-combinators'),
+    tuples      = require('fantasy-tuples'),
+    Seq         = require('./seq'),
 
     constant = combinators.constant,
     identity = combinators.identity,
     
+    Tuple2 = tuples.Tuple2,
+
     List = daggy.taggedSum({
         Cons: ['x', 'xs'],
         Nil : []
@@ -426,6 +430,46 @@ List.prototype.groupBy = function(f) {
             }));
         }
     });
+};
+
+List.prototype.nub = function() {
+    return this.nubBy(eq);
+};
+
+List.prototype.nubBy = function(f) {
+    return this.cata({
+        Nil: constant(List.Nil),
+        Cons: function(x, xs) {
+            return List.Cons(x, (xs.filter(function(y) {
+                return !f(x, y);
+            }).nubBy(f)));
+        }
+    });
+};
+
+List.prototype.zipWith = function(f, x) {
+    var go = function(x, y, acc) {
+        return x.cata({
+            Nil: constant(acc),
+            Cons: function(x, xs) {
+                return y.cata({
+                    Nil: constant(acc),
+                    Cons: function(y, ys) {
+                        return go(xs, ys, List.Cons(f(x, y), acc));
+                    }
+                });
+            }
+        });
+    };
+    return go(this, x, List.Nil);
+};
+
+List.prototype.zip = function(x) {
+    return this.zipWith(Tuple2, x);
+};
+
+List.prototype.toSeq = function() {
+    return Seq(this.toArray());
 };
 
 List.prototype.toArray = function() {

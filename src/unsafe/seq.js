@@ -1,5 +1,5 @@
 function unsafeIndex(x, n) {
-    return x[n];
+    return x.x[n];
 }
 
 function head(x) {
@@ -7,15 +7,15 @@ function head(x) {
 }
 
 function tail(x) {
-    return x.slice(1, x.length);
+    return x.x.slice(1, x.x.length);
 }
 
 function last(x) {
-    return unsafeIndex(x, x.length - 1);
+    return unsafeIndex(x, x.x.length - 1);
 }
 
 function init(x) {
-    return x.slice(0, x.length - 1);
+    return x.x.slice(0, x.x.length - 1);
 }
 
 // Export

@@ -8,7 +8,7 @@ var λ       = require('fantasy-check/src/adapters/nodeunit'),
     identity = combinators.identity;
 
 function run(x) {
-    return x.toSequence().toArray();
+    return x.toArray();
 }
 
 exports.nonempty = {

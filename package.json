@@ -19,9 +19,10 @@
   },
   "dependencies": {
     "daggy": "0.0.x",
-    "fantasy-combinators": "0.0.x",
-    "fantasy-options": "0.0.x",
-    "fantasy-tuples": "0.0.x"
+    "fantasy-combinators": "^0.x.x",
+    "fantasy-options": "^0.x.x",
+    "fantasy-tuples": "^0.x.x",
+    "fantasy-helpers": "^0.x.x"
   },
   "devDependencies": {
     "grunt-cli": "0.1.9",
@@ -29,7 +30,6 @@
     "grunt-contrib-jshint": "0.6.x",
     "grunt-contrib-nodeunit": "0.2.0",
     "fantasy-check": "0.1.6",
-    "fantasy-helpers": "0.0.x",
     "fantasy-identities": "0.x.x"
   },
   "scripts": {
