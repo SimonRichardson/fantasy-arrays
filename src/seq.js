@@ -219,6 +219,12 @@ Seq.prototype.filterM = function(f) {
     });
 };
 
+Seq.prototype.find = function(f) {
+    return this.foldl(function(acc, x) {
+        return f(x) ? Option.Some(x) : acc; 
+    }, Option.None);
+};
+
 Seq.prototype.mapMaybe = function(f) {
     return this.concatMap(function(x) {
         return f.fold(Seq.empty, singleton);
@@ -266,6 +272,34 @@ Seq.prototype.span = function(f) {
         );
     };
     return go(this, Seq.empty());
+};
+
+Seq.prototype.foldr = function(f, acc) {
+    var i;
+    for (i = this.x.length - 1; i >= 0; i--) {
+        acc = f(this.x[i], acc);
+    }
+    return acc;
+};
+
+Seq.prototype.foldl = function(f, acc) {
+    var i, l;
+    for (i = 0, l = this.x.length; i < l; i++) {
+        acc = f(acc, this.x[i]);
+    }
+    return acc;
+};
+
+Seq.prototype.foldMap = function(f, p) {
+    return this.foldr(function(x, acc) {
+        return f(x).concat(acc);
+    }, p.empty());
+};
+
+Seq.prototype.mconcat = function(p) {
+    return this.foldl(function(x, acc) {
+        return x.concat(acc);
+    }, p.empty());
 };
 
 Seq.prototype.group = function() {
