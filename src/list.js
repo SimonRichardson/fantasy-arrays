@@ -1,6 +1,8 @@
 var daggy       = require('daggy'),
     combinators = require('fantasy-combinators'),
     tuples      = require('fantasy-tuples'),
+    Option      = require('fantasy-options'),
+    eq          = require('./eq'),
     Seq         = require('./seq'),
 
     constant = combinators.constant,
@@ -262,12 +264,7 @@ List.prototype.concat = function(a) {
 };
 
 List.prototype.concatMap = function(f) {
-    return this.cata({
-        Nil: constant(List.Nil),
-        Cons: function(x, xs) {
-            return xs.concatMap(f).concat(f(x));
-        }
-    });
+    return this.chain(f);
 };
 
 List.prototype.map = function(f) {
@@ -283,7 +280,12 @@ List.prototype.map = function(f) {
 };
 
 List.prototype.chain = function(f) {
-    return this;
+    return this.cata({
+        Nil: constant(List.Nil),
+        Cons: function(x, xs) {
+            return xs.concatMap(f).concat(f(x));
+        }
+    });
 };
 
 List.prototype.filter = function(f) {

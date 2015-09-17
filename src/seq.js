@@ -1,6 +1,8 @@
 var daggy       = require('daggy'),
     combinators = require('fantasy-combinators'),
     tuples      = require('fantasy-tuples'),
+    Option      = require('fantasy-options'),
+    eq          = require('./eq'),
 
     constant = combinators.constant,
     identity = combinators.identity,
@@ -18,10 +20,6 @@ Seq.singleton = Seq.of;
 Seq.empty = function() {
     return Seq([]);
 };
-
-function eq(a, b) {
-    return a === b;
-}
 
 Seq.range = function(a, b) {
     var step = a > b ? -1 : 1,

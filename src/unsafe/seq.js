@@ -1,3 +1,5 @@
+var Seq = require('./../seq');
+
 function unsafeIndex(x, n) {
     return x.x[n];
 }
@@ -7,7 +9,7 @@ function head(x) {
 }
 
 function tail(x) {
-    return x.x.slice(1, x.x.length);
+    return Seq(x.x.slice(1, x.x.length));
 }
 
 function last(x) {
@@ -15,7 +17,7 @@ function last(x) {
 }
 
 function init(x) {
-    return x.x.slice(0, x.x.length - 1);
+    return Seq(x.x.slice(0, x.x.length - 1));
 }
 
 // Export
