@@ -1,11 +1,11 @@
 var daggy  = require('daggy'),
-    Seq    = require('./../seq'),
+    List   = require('./../list'),
     Option = require('fantasy-options'),
 
     Zipper = daggy.tagged('l', 'c', 'r');
 
 Zipper.of = function(x) {
-    return Zipper(Seq.empty(), x, Seq.empty());
+    return Zipper(List.empty(), x, List.empty());
 };
 
 Zipper.prototype.up = function() {
@@ -54,12 +54,12 @@ Zipper.prototype.lastJust = function(f) {
     });
 };
 
-Zipper.prototype.toSeq = function() {
+Zipper.prototype.toList = function() {
     return this.l.concat(this.r.cons(this.c));
 };
 
 Zipper.prototype.toArray = function() {
-    return this.toSeq().toArray();
+    return this.toList().toArray();
 };
 
 // Export

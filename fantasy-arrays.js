@@ -3,6 +3,7 @@ var List       = require('./src/list'),
     Seq        = require('./src/seq'),
     unsafeList = require('./src/unsafe/list'),
     unsafeSeq  = require('./src/unsafe/seq'),
+    zipperList = require('./src/zippers/list'),
     zipperSeq  = require('./src/zippers/seq');
 
 if (typeof module != 'undefined')
@@ -15,6 +16,7 @@ if (typeof module != 'undefined')
             seq : unsafeSeq
         },
         zippers : {
+            List: zipperList,
             Seq : zipperSeq
         }
     };
