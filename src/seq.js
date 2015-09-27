@@ -346,6 +346,21 @@ Seq.prototype.nubBy = function(f) {
     );
 };
 
+Seq.prototype.partition = function(f) {
+    var l = this.x.length,
+        result = Tuple2(Seq.empty(), Seq.empty()),
+        val;
+    for (i = 0; i < l; i++) {
+        val = this.x[i];
+        if (f(val)) {
+            result._1.x.push(val);
+        } else {
+            result._2.x.push(val);
+        }
+    }
+    return res;
+};
+
 Seq.prototype.zipWith = function(f, xs) {
     var l = this.x.length < xs.x.length ? this.x.length : xs.x.length,
         result = Seq(new Array(l)),
