@@ -178,7 +178,8 @@ Seq.prototype.reverse = function() {
 };
 
 Seq.prototype.concat = function(a) {
-    return Seq(a.x.concat(this.x));
+    // We have to do this, because of Writer default semigroup.
+    return Seq(a.x ? a.x.concat(this.x) : this.x);
 };
 
 Seq.prototype.concatMap = function(f) {
