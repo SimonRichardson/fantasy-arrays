@@ -66,7 +66,9 @@ Seq.prototype.snoc = function(a) {
 };
 
 Seq.prototype.head = function() {
-    return this._uncons(constant(Option.None), Option.of);
+    return this._uncons(constant(Option.None), function(a, b) {
+        return Option.of(a);
+    });
 };
 
 Seq.prototype.last = function() {
