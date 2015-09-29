@@ -93,7 +93,7 @@ Seq.prototype.uncons = function(x, y) {
 };
 
 Seq.prototype._uncons = function(x, y) {
-    return this.x.length === 0 ? x() : y(x[0], Seq(x.slice(1)));
+    return this.x.length === 0 ? x() : y(this.x[0], Seq(this.x.slice(1)));
 };
 
 Seq.prototype.index = function(x) {
