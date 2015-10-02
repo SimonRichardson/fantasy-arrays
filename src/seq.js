@@ -305,6 +305,28 @@ Seq.prototype.foldMap = function(f, p) {
     }, p.empty());
 };
 
+Seq.prototype.reducer = function(f)  {
+    var self = this;
+    return this.head().map(acc => {
+        var i;
+        for (i = self.x.length - 2; i >= 0; i--) {
+            acc = f(self.x[i], acc);
+        }
+        return acc;
+    });
+};
+
+Seq.prototype.reducel = function(f)  {
+    var self = this;
+    return this.last().map(acc => {
+        var i, l;
+        for (i = 1, l = self.x.length; i < l; i++) {
+            acc = f(acc, self.x[i]);
+        }
+        return acc;
+    });
+};
+
 Seq.prototype.mconcat = function(p) {
     return this.foldl(function(x, acc) {
         return x.concat(acc);
@@ -361,7 +383,7 @@ Seq.prototype.partition = function(f) {
             result._2.x.push(val);
         }
     }
-    return res;
+    return result;
 };
 
 Seq.prototype.zipWith = function(f, xs) {
