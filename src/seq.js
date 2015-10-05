@@ -307,7 +307,7 @@ Seq.prototype.foldMap = function(f, p) {
 
 Seq.prototype.reducer = function(f)  {
     var self = this;
-    return this.head().map(acc => {
+    return this.last().map(acc => {
         var i;
         for (i = self.x.length - 2; i >= 0; i--) {
             acc = f(self.x[i], acc);
@@ -318,7 +318,7 @@ Seq.prototype.reducer = function(f)  {
 
 Seq.prototype.reducel = function(f)  {
     var self = this;
-    return this.last().map(acc => {
+    return this.head().map(acc => {
         var i, l;
         for (i = 1, l = self.x.length; i < l; i++) {
             acc = f(acc, self.x[i]);
@@ -338,20 +338,27 @@ Seq.prototype.group = function() {
 };
 
 Seq.prototype.groupBy = function(f) {
-    var go = function(xs, acc) {
-        return xs._uncons(
-            function() {
-                return acc.reverse();
-            },
-            function(h, t) {
-                var sp = t.span(function(v) {
-                    return f(h);
-                });
-                return go(sp.tail, acc.cons(sp.init.cons(h)));
+    var i, l, index,
+        result = [],
+        indexOf = function(x, y) {
+            var i, l;
+            for (i = 0, l = x.length; i < l; i++) {
+                if (x[i].length() > 0 && f(x[i].x[0], y)) {
+                    return i;
+                }
             }
-        );
-    };
-    return go(this, Seq.empty());
+            return -1;
+        };
+
+    for (i = 0, l = this.x.length; i < l; i++) {
+        index = indexOf(result, this.x[i]);
+        if(index < 0) {
+            result.push(Seq.of(this.x[i]));
+        } else {
+            result[index] = result[index].snoc(this.x[i]);
+        }
+    }
+    return Seq(result);
 };
 
 Seq.prototype.nub = function() {
