@@ -1,6 +1,6 @@
 {
   "name": "fantasy-arrays",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Homogenous array sequence data structure.",
   "repository": {
     "type": "git",

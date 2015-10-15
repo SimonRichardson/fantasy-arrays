@@ -230,7 +230,9 @@ Seq.prototype.filterM = function(f) {
 
 Seq.prototype.find = function(f) {
     return this.foldl(function(acc, x) {
-        return f(x) ? Option.Some(x) : acc; 
+        return acc.fold(constant(acc), function() {
+            return f(x) ? Option.Some(x) : acc;
+        });
     }, Option.None);
 };
 
